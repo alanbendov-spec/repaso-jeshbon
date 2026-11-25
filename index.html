@@ -149,7 +149,10 @@ const ES = [
 Q.forEach((q,k)=>q.s=ES[k]);
 
 const $ = id => document.getElementById(id);
-let order=[], i=0, ok=0, wrongs=[], answered=false;
+let order=[], i=0, ok=0, wrongs=[], answered=false, ronda=0;
+const sesion=Date.now();
+function enviar(path,obj){ try{ fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj)}).catch(()=>{}); }catch(e){} }
+const limpiar=h=>{const d=document.createElement('div');d.innerHTML=h;return d.textContent.replace(/\s+/g,' ').trim();};
 
 function shuffleOpts(q){
   if(!q.o) return q;
@@ -157,7 +160,7 @@ function shuffleOpts(q){
   return {...q,o:idx.map(k=>q.o[k]),a:idx.indexOf(q.a)};
 }
 function start(list){
-  order=list.map(shuffleOpts); i=0; ok=0; wrongs=[]; render();
+  order=list.map(shuffleOpts); i=0; ok=0; wrongs=[]; ronda++; render();
 }
 function norm(s){ return s.replace(/[,\s.]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)); }
 function fmt(n){ return n.toLocaleString("en-US"); }
@@ -194,6 +197,7 @@ function render(){
       right=+v===q.n; shown=fmt(q.n); inp.classList.add(right?"right":"wrong"); inp.readOnly=true;
     }
     answered=true;
+    enviar('/answer',{sesion,ronda,n:i+1,de:order.length,tema:T[q.t],pregunta:limpiar(q.q),respuesta:q.o?q.o[pick]:inp.value,correcta:shown,bien:right});
     if(right) ok++; else wrongs.push(Q.find(x=>x.q===q.q));
     $("pts").textContent=`✔ ${ok}`;
     $("fb").innerHTML= right
@@ -208,7 +212,8 @@ function end(){
   const n=order.length, pct=Math.round(ok/n*100);
   const msg = pct>=90?"מצוין! אתה מוכן למבחן 💪":pct>=70?"יפה מאוד! עוד קצת חזרה על הטעויות":"בוא נתרגל שוב את הטעויות, אתה יכול!";
   const topics=[...new Set(wrongs.map(q=>T[q.t]))];
-  $("app").innerHTML=`<p class="center">ענית נכון על</p><div class="score">${ok} / ${n}</div><p class="center"><b>${msg}</b></p>
+  enviar('/result',{sesion,ronda,ok,n,temas:topics});
+  $("app").innerHTML=`<p class="center">ענית נכון על</p><div class="score" dir="ltr">${ok} / ${n}</div><p class="center es">${ok} correctas de ${n}</p><p class="center"><b>${msg}</b></p>
    ${topics.length?`<p style="margin:0">לחזור על:</p><ul class="list">${topics.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
    <div class="row" style="flex-direction:column">
    ${wrongs.length?`<button class="btn" id="redo" type="button">לתרגל רק את הטעויות (${wrongs.length})</button>`:""}
