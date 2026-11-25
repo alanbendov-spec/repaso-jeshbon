@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>חזרה בחשבון – יהודה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: one question card at a time, big touch targets, progress on top */
+:root{
+  --bg:#f4f7fc; --card:#ffffff; --fg:#1b2333; --muted:#5d6880; --line:#d8dff0;
+  --accent:#2c64d8; --accent-ink:#ffffff; --chip:#e7eefc;
+  --ok:#1b8a4b; --ok-bg:#e3f5ea; --bad:#c23b3b; --bad-bg:#fbe7e7;
+  --font:"Rubik","Arial Hebrew",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121725; --card:#1b2234; --fg:#e8edf7; --muted:#9aa6c0; --line:#2e3850;
+  --accent:#6f9bff; --accent-ink:#0d1324; --chip:#243152;
+  --ok:#5fd394; --ok-bg:#163a28; --bad:#ff8a8a; --bad-bg:#43201f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121725; --card:#1b2234; --fg:#e8edf7; --muted:#9aa6c0; --line:#2e3850;
+  --accent:#6f9bff; --accent-ink:#0d1324; --chip:#243152;
+  --ok:#5fd394; --ok-bg:#163a28; --bad:#ff8a8a; --bad-bg:#43201f; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:17px/1.5 var(--font);direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 28px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:8px}
+h1{font-size:21px;margin:0;font-weight:800;text-wrap:balance}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.chip{align-self:flex-start;background:var(--chip);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:99px}
+.q{font-size:20px;font-weight:500;margin:0}
+.es{margin:-6px 0 0;color:var(--muted);font-size:15px;text-align:left}
+.ex{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:800;font-size:24px;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;font-variant-numeric:tabular-nums;width:100%}
+.tbl td{border:1px solid var(--line);padding:6px 4px;text-align:center;font-size:16px}
+.tbl td:first-child{font-weight:700;font-size:14px;text-align:right;padding-inline:8px}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;font-size:18px;text-align:right;padding:14px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.opt:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.sel{border-color:var(--accent);background:var(--chip)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+input{font:inherit;font-size:26px;font-weight:700;text-align:center;direction:ltr;width:100%;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--fg)}
+input.right{border-color:var(--ok);background:var(--ok-bg)} input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.btn{font:inherit;font-weight:700;font-size:19px;padding:14px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;width:100%}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn:disabled{opacity:.45}
+.fb{border-radius:14px;padding:12px 14px;font-size:16px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)} .fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb b{font-size:18px}
+.fb .why{display:block;color:var(--fg);margin-top:4px}
+.score{font-size:46px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;color:var(--accent)}
+.center{text-align:center;margin:0}
+.list{margin:0;padding-inline-start:20px;color:var(--muted);font-size:15px}
+.row{display:flex;gap:10px}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header>
+    <h1>חזרה למבחן בחשבון · כיתה ד׳</h1>
+    <div class="meta"><span id="pos">שאלה 1</span><span id="pts">✔ 0</span></div>
+    <div class="bar"><i id="bar"></i></div>
+  </header>
+  <main id="app" class="card" aria-live="polite"></main>
+</div>
+
+<script>
+const T = {
+  dec:"מבנה עשרוני", seq:"סדרות", calc:"תרגילי חשבון", ord:"סדר פעולות",
+  miss:"מספרים חסרים", word:"בעיות מילוליות", tab:"קריאת טבלה"
+};
+const tableHTML = `<div class="tbl"><table>
+<tr><td>מספר האחים</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>מספר התלמידים</td><td>2</td><td>6</td><td>5</td><td>4</td><td>3</td><td>1</td></tr></table></div>`;
+const shop = `בחנות: מחברת <b>15 ש״ח</b>, קלמר <b>40 ש״ח</b>, תיק <b>120 ש״ח</b>.<br>`;
+const e = s => `<span class="ex">${s}</span>`;
+
+const Q = [
+ {t:"dec",q:`איך כותבים את המספר ${e("4,805")} במילים?`,o:["ארבעת אלפים שמונה מאות וחמש","ארבעת אלפים שמונים וחמש","ארבע מאות שמונים וחמש","ארבעת אלפים חמש מאות ושמונה"],a:0,w:"4 אלפים, 8 מאות, 0 עשרות, 5 יחידות. את ה-0 לא אומרים."},
+ {t:"dec",q:`איך כותבים את המספר ${e("7,032")} במילים?`,o:["שבעת אלפים שלוש מאות ושתיים","שבעת אלפים שלושים ושתיים","שבע מאות שלושים ושתיים","שבעת אלפים עשרים ושלוש"],a:1,w:"7 אלפים, 0 מאות, 3 עשרות, 2 יחידות."},
+ {t:"dec",q:"כתבו בספרות: חמשת אלפים ארבע מאות ותשע",n:5409,w:"5 אלפים, 4 מאות, 0 עשרות, 9 יחידות = 5,409"},
+ {t:"dec",q:`מה הערך של הספרה 6 במספר ${e("3,684")}?`,o:["6","60","600","6,000"],a:2,w:"ה-6 נמצא במקום המאות, לכן הוא שווה 600."},
+ {t:"dec",q:`בעזרת הספרות ${e("4, 8, 0, 5")} כתבו את המספר <b>האי-זוגי</b> הגדול ביותר`,n:8405,w:"מספר אי-זוגי נגמר בספרה אי-זוגית: 5 בסוף. את השאר מהגדול לקטן: 8, 4, 0 → 8,405"},
+ {t:"dec",q:`בעזרת הספרות ${e("3, 6, 1, 8")} כתבו את המספר <b>הזוגי</b> הגדול ביותר`,n:8316,w:"זוגי נגמר בספרה זוגית. אם ה-6 בסוף: 8,316. אם ה-8 בסוף: 6,318. הגדול הוא 8,316."},
+ {t:"dec",q:`במספר ${e("6,472")} מחליפים את הספרה 7 בספרה 0. מה קורה?`,o:["המספר קטן ב-70","המספר קטן ב-7","המספר גדל ב-70","המספר קטן ב-700"],a:0,w:"ה-7 נמצא במקום העשרות (70). המספר החדש 6,402 קטן ב-70."},
+ {t:"dec",q:`במספר ${e("5,384")} מחליפים את הספרה 3 בספרה 9. בכמה המספר <b>גדל</b>?`,n:600,w:"ה-3 במקום המאות: 300 הופך ל-900. המספר החדש 5,984, גדל ב-600."},
+ {t:"dec",q:"איזה מספר הוא הגדול ביותר?",o:["4,099","4,190","4,109","4,019"],a:1,w:"כולם 4 אלפים. במאות: ל-4,190 ול-4,109 יש 1 מאה. בעשרות: 9 גדול מ-0, לכן 4,190."},
+ {t:"seq",q:`השלימו את המספר הבא בסדרה: ${e("3,800 → 3,500 → 3,200 → ?")}`,n:2900,w:"כל פעם יורדים 300. 3,200 − 300 = 2,900 (ואחריו 2,600)."},
+ {t:"seq",q:`השלימו את המספר הבא בסדרה: ${e("2,450 → 2,700 → 2,950 → ?")}`,n:3200,w:"כל פעם עולים 250. 2,950 + 250 = 3,200."},
+ {t:"seq",q:`מה הקפיצה בסדרה ${e("9,000 → 8,600 → 8,200")}?`,o:["+400","−400","−40","−600"],a:1,w:"9,000 − 8,600 = 400, והסדרה יורדת: −400."},
+ {t:"calc",q:e("376 + 458 = ?"),n:834,w:"6+8=14 (כותבים 4, זוכרים 1). 7+5+1=13 (3, זוכרים 1). 3+4+1=8 → 834"},
+ {t:"calc",q:e("604 − 247 = ?"),n:357,w:"4−7 אי אפשר: לוקחים מהמאות. 14−7=7, 9−4=5, 5−2=3 → 357"},
+ {t:"calc",q:e("587 + 276 = ?"),n:863,w:"7+6=13, 8+7+1=16, 5+2+1=8 → 863"},
+ {t:"calc",q:e("703 − 158 = ?"),n:545,w:"13−8=5, 9−5=4 (אחרי ההשאלה), 6−1=5 → 545"},
+ {t:"calc",q:e("36 × 5 = ?"),n:180,w:"30×5=150, 6×5=30, 150+30=180"},
+ {t:"calc",q:e("48 × 6 = ?"),n:288,w:"40×6=240, 8×6=48, 240+48=288"},
+ {t:"calc",q:e("72 : 8 = ?"),n:9,w:"8×9=72, לכן 72:8=9"},
+ {t:"ord",q:e("24 − 15 : 3 = ?"),n:19,w:"קודם חילוק! 15:3=5, ואז 24−5=19"},
+ {t:"ord",q:e("5 + 4 × 7 = ?"),o:["63","33","36","16"],a:1,w:"קודם כפל: 4×7=28, ואז 5+28=33"},
+ {t:"ord",q:e("(20 − 8) × 3 = ?"),n:36,w:"קודם הסוגריים: 20−8=12, ואז 12×3=36"},
+ {t:"ord",q:e("30 − 18 : 3 = ?"),n:24,w:"קודם חילוק: 18:3=6, ואז 30−6=24"},
+ {t:"miss",q:`השלימו: ${e("360 + 140 = 460 + ?")}`,n:40,w:"360+140=500. כמה חסר ל-460 כדי להגיע ל-500? 40. (או: 460 גדול מ-360 ב-100, אז 140−100=40)"},
+ {t:"miss",q:`השלימו: ${e("80 + ? = 430")}`,n:350,w:"430−80=350"},
+ {t:"miss",q:`השלימו: ${e("4,200 = ? × 70")}`,n:60,w:"7×6=42, לכן 70×60=4,200"},
+ {t:"miss",q:`השלימו: ${e("512 : 1 = 512 + ?")}`,o:["0","1","512","511"],a:0,w:"מספר חלקי 1 נשאר אותו מספר: 512. כדי ש-512+? יהיה 512, חסר 0."},
+ {t:"word",q:shop+"עידו קנה 4 מחברות ותיק אחד. כמה שילם (בש״ח)?",n:180,w:"4×15=60, ועוד תיק 120: 60+120=180 ש״ח"},
+ {t:"word",q:shop+"איתי שילם <b>בדיוק 200 ש״ח</b>. איזו קנייה אפשרית?",o:["תיק ו-2 קלמרים","תיק ו-3 מחברות","4 קלמרים ומחברת","תיק, קלמר ומחברת"],a:0,w:"120+40+40=200 ✔. (תיק+3 מחברות=165, 4 קלמרים+מחברת=175, תיק+קלמר+מחברת=175)"},
+ {t:"word",q:"ספר עולה <b>35 ש״ח</b> ומחברת עולה <b>12 ש״ח</b>. דני קנה 2 ספרים ו-3 מחברות. כמה שילם (בש״ח)?",n:106,w:"2×35=70, 3×12=36, 70+36=106 ש״ח"},
+ {t:"word",q:"לליה היו <b>100 ש״ח</b>. היא קנתה 3 עטים, כל עט ב-<b>14 ש״ח</b>. כמה כסף נשאר לה?",n:58,w:"3×14=42, ואז 100−42=58 ש״ח"},
+ {t:"tab",q:tableHTML+"לכמה תלמידים יש <b>2 אחים</b>?",n:5,w:"מוצאים 2 בשורה העליונה, ומסתכלים מתחת: 5 תלמידים."},
+ {t:"tab",q:tableHTML+"כמה תלמידים יש <b>בכיתה</b>?",n:21,w:"מחברים את כל השורה התחתונה: 2+6+5+4+3+1=21"},
+ {t:"tab",q:tableHTML+"לכמה תלמידים יש <b>יותר מ-3</b> אחים?",o:["3","4","7","8"],a:1,w:"יותר מ-3 = 4 או 5 אחים: 3+1=4 תלמידים."}
+];
+
+const ES = [
+ "¿Cómo se escribe 4.805 en palabras?",
+ "¿Cómo se escribe 7.032 en palabras?",
+ "Escribe en números: cinco mil cuatrocientos nueve",
+ "¿Cuánto vale el dígito 6 en el número 3.684?",
+ "Con los dígitos 4, 8, 0, 5 escribe el número IMPAR más grande",
+ "Con los dígitos 3, 6, 1, 8 escribe el número PAR más grande",
+ "En 6.472 cambian el 7 por un 0. ¿Qué pasa?",
+ "En 5.384 cambian el 3 por un 9. ¿Cuánto CRECE el número?",
+ "¿Cuál es el número más grande?",
+ "Completa el número que sigue en la secuencia",
+ "Completa el número que sigue en la secuencia",
+ "¿De cuánto es el salto en la secuencia?",
+ "Suma","Resta","Suma","Resta","Multiplicación","Multiplicación","División",
+ "Orden de operaciones: primero × y :","Orden de operaciones: primero × y :","Primero el paréntesis","Orden de operaciones: primero × y :",
+ "Completa el número que falta","Completa el número que falta","Completa el número que falta","Completa el número que falta",
+ "Tienda: cuaderno 15 ₪, estuche 40 ₪, mochila 120 ₪. Ido compró 4 cuadernos y una mochila. ¿Cuánto pagó?",
+ "Itai pagó exactamente 200 ₪. ¿Qué compra es posible?",
+ "Un libro cuesta 35 ₪ y un cuaderno 12 ₪. Dani compró 2 libros y 3 cuadernos. ¿Cuánto pagó?",
+ "Lía tenía 100 ₪. Compró 3 lápices de 14 ₪ cada uno. ¿Cuánto le queda?",
+ "Tabla (hermanos / alumnos): ¿cuántos alumnos tienen 2 hermanos?",
+ "¿Cuántos alumnos hay en la clase?",
+ "¿Cuántos alumnos tienen MÁS de 3 hermanos?"
+];
+Q.forEach((q,k)=>q.s=ES[k]);
+
+const $ = id => document.getElementById(id);
+let order=[], i=0, ok=0, wrongs=[], answered=false;
+
+function shuffleOpts(q){
+  if(!q.o) return q;
+  const idx=q.o.map((_,k)=>k).sort(()=>Math.random()-.5);
+  return {...q,o:idx.map(k=>q.o[k]),a:idx.indexOf(q.a)};
+}
+function start(list){
+  order=list.map(shuffleOpts); i=0; ok=0; wrongs=[]; render();
+}
+function norm(s){ return s.replace(/[,\s.]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)); }
+function fmt(n){ return n.toLocaleString("en-US"); }
+
+function render(){
+  answered=false;
+  const q=order[i], app=$("app");
+  $("pos").textContent=`שאלה ${i+1} מתוך ${order.length}`;
+  $("pts").textContent=`✔ ${ok}`;
+  $("bar").style.width=(i/order.length*100)+"%";
+  let body=`<span class="chip">${T[q.t]}</span><p class="q">${q.q}</p><p class="es" dir="ltr">🇪🇸 ${q.s||""}</p>`;
+  if(q.o){
+    body+=`<div class="opts">${q.o.map((x,k)=>`<button class="opt" data-k="${k}" type="button">${x}</button>`).join("")}</div>`;
+  } else {
+    body+=`<input id="ans" inputmode="numeric" autocomplete="off" placeholder="?" aria-label="תשובה">`;
+  }
+  body+=`<div id="fb"></div><button class="btn" id="go" type="button" ${q.o?"disabled":""}>בדיקה</button>`;
+  app.innerHTML=body;
+  let pick=null;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(answered) return;
+    app.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); pick=+b.dataset.k; $("go").disabled=false;
+  });
+  const inp=$("ans");
+  if(inp){ inp.focus({preventScroll:true}); inp.addEventListener("keydown",ev=>{ if(ev.key==="Enter") $("go").click(); }); }
+  $("go").onclick=()=>{
+    if(answered){ next(); return; }
+    let right, shown;
+    if(q.o){ if(pick===null) return; right=pick===q.a; shown=q.o[q.a];
+      app.querySelectorAll(".opt").forEach((b,k)=>{ if(k===q.a) b.classList.add("right"); else if(k===pick) b.classList.add("wrong"); });
+    } else {
+      const v=norm(inp.value); if(v==="") { inp.focus(); return; }
+      right=+v===q.n; shown=fmt(q.n); inp.classList.add(right?"right":"wrong"); inp.readOnly=true;
+    }
+    answered=true;
+    if(right) ok++; else wrongs.push(Q.find(x=>x.q===q.q));
+    $("pts").textContent=`✔ ${ok}`;
+    $("fb").innerHTML= right
+      ? `<div class="fb ok"><b>נכון! 🎉</b><span class="why">${q.w}</span></div>`
+      : `<div class="fb bad"><b>לא נכון. התשובה: <span class="ex" style="font-size:18px">${shown}</span></b><span class="why">${q.w}</span></div>`;
+    $("go").textContent = i===order.length-1 ? "לתוצאה" : "הבא ←";
+  };
+}
+function next(){ i++; if(i<order.length) { render(); window.scrollTo({top:0}); } else end(); }
+function end(){
+  $("bar").style.width="100%"; $("pos").textContent="סיום";
+  const n=order.length, pct=Math.round(ok/n*100);
+  const msg = pct>=90?"מצוין! אתה מוכן למבחן 💪":pct>=70?"יפה מאוד! עוד קצת חזרה על הטעויות":"בוא נתרגל שוב את הטעויות, אתה יכול!";
+  const topics=[...new Set(wrongs.map(q=>T[q.t]))];
+  $("app").innerHTML=`<p class="center">ענית נכון על</p><div class="score">${ok} / ${n}</div><p class="center"><b>${msg}</b></p>
+   ${topics.length?`<p style="margin:0">לחזור על:</p><ul class="list">${topics.map(t=>`<li>${t}</li>`).join("")}</ul>`:""}
+   <div class="row" style="flex-direction:column">
+   ${wrongs.length?`<button class="btn" id="redo" type="button">לתרגל רק את הטעויות (${wrongs.length})</button>`:""}
+   <button class="btn ghost" id="again" type="button">להתחיל מההתחלה</button></div>`;
+  if(wrongs.length) $("redo").onclick=()=>start(wrongs.slice());
+  $("again").onclick=()=>start(Q);
+}
+start(Q);
+</script>
+
+</body>
+</html>
